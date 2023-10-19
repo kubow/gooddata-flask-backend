@@ -21,7 +21,11 @@ class LoadGoodDataSdk:
         self.declarative_workspaces = self._sdk.catalog_workspace.get_declarative_workspaces()
 
     def push_to_prod(self, ws_id, name, parent_id):
-        self._sdk.catalog_workspace.create_or_update(ws_id, name, parent_id)
+        if parent_id is None:
+            parent_id = ""  # Convert None to an empty string
+
+        workspace = CatalogWorkspace(workspace_id=ws_id, name=name, parent_id=parent_id)
+        self._sdk.catalog_workspace.create_or_update(workspace)
 
     def organization(self):
         print(f"\nCurrent organization info:")  # ORGANIZATION INFO
@@ -210,17 +214,6 @@ def visualize_workspace_hierarchy(sdk: classmethod):
 
     return json_data
 
-
-# data = {
-#     "ws hierarchy": {
-#         "ws_id": {
-#             "name": "Workspace Name",
-#             "wdf_id": "WDF Client ID",
-#             "parent_id": "Parent ID"
-#         }
-#     }
-# }
-
 data = {
     "ws hierarchy": {
         "ws_id1": {
@@ -241,11 +234,6 @@ data = {
     }
 }
 
-
-
-
-
-
 # def create_workspace(ws_id, name):
 #     # Call the function to create a workspace
 #     sdk.catalog_workspace.create_or_update(
@@ -264,7 +252,7 @@ if __name__ == "__main__":
 
     # VIEW func
     json_data = visualize_workspace_hierarchy(gooddata._sdk)
-    print(json_data)
+    #print(json_data)
 
     # #CREATE func
     # Iterate through the data and call the function for each key where parent_id is None
@@ -272,5 +260,7 @@ if __name__ == "__main__":
     #     if workspace_data.get("parent_id") is None:
     #         create_workspace(ws_id, workspace_data.get("name"))
 
-    # PUSH TO PROD
-    gooddata.push_to_prod("test", "test", None)
+    # Create or Update
+    gooddata.push_to_prod("123", "Test demo", None)
+
+
