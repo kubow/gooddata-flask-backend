@@ -32,8 +32,14 @@ class LoadGoodDataSdk:
         self._sdk.catalog_workspace.create_or_update(workspace)
 
     def delete_wks(self, ws_id):
-        # Delete workspace
         self._sdk.catalog_workspace.delete_workspace(workspace_id=ws_id)
+
+    def get_wks(self, ws_id):
+        return self._sdk.catalog_workspace.get_declarative_workspace(workspace_id=ws_id)
+
+    def put_wks(self, ws_id, layout):
+        return self._sdk.catalog_workspace.put_declarative_workspace(workspace_id=ws_id, workspace=layout)
+
 
     def organization(self):
         print(f"\nCurrent organization info:")  # ORGANIZATION INFO
@@ -242,15 +248,6 @@ data = {
     }
 }
 
-# def create_workspace(ws_id, name):
-#     # Call the function to create a workspace
-#     sdk.catalog_workspace.create_or_update(
-#         CatalogWorkspace(
-#             workspace_id=ws_id,
-#             name=name
-#         )
-#     )
-
 
 if __name__ == "__main__":
     # host, token, sdk = init_gd()
@@ -262,16 +259,18 @@ if __name__ == "__main__":
     json_data = visualize_workspace_hierarchy(gooddata._sdk)
     #print(json_data)
 
-    # #CREATE func
-    # Iterate through the data and call the function for each key where parent_id is None
-    # for ws_id, workspace_data in data.get("ws hierarchy", {}).items():
-    #     if workspace_data.get("parent_id") is None:
-    #         create_workspace(ws_id, workspace_data.get("name"))
-
     # Create or Update
-    #gooddata.create_wks("test2", "Test demo", "production")
+    # gooddata.create_wks("prod_hack", "Prod Hack", None)
+    # gooddata.create_wks("dev_hack", "Dev Hack", None)
+
     #gooddata.manage_wks("test2", "Test", "production") # Change name, or delete. id and parent_id cannot be changed
-    #gooddata.delete_wks("123")
+    # gooddata.delete_wks("dev_hack")
+
+    # Push to Prod
+    gooddata.get_wks("dev_hack")
+    gooddata.put_wks("prod_hack", gooddata.get_wks("dev_hack"))
+
+
 
 
 
