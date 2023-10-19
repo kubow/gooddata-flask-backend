@@ -40,6 +40,39 @@ class LoadGoodDataSdk:
     def put_wks(self, ws_id, layout):
         return self._sdk.catalog_workspace.put_declarative_workspace(workspace_id=ws_id, workspace=layout)
 
+    def visualize_workspace_hierarchy(self):
+        data = {}
+
+        tree = Tree()
+        tree.create_node("GoodData", "root")
+        for workspace in self._sdk.catalog_workspace.list_workspaces():
+            # print(workspace)
+            parent_id = workspace.parent_id if workspace.parent_id else "root"
+            # print(workspace.id, workspace.name, workspace.parent_id)
+            data[workspace.id] = {
+                'name': workspace.name,
+                'parent_id': workspace.parent_id
+            }
+
+            def create_workspace_structure(data, parent_id=None):
+                workspace_list = []
+
+                for key, value in data.items():
+                    if value["parent_id"] == parent_id:
+                        workspace = {
+                            "id": key,
+                            "name": value["name"],
+                            "parent_id": parent_id,
+                            "children": create_workspace_structure(data, key)
+                        }
+                        workspace_list.append(workspace)
+
+                return workspace_list
+
+            workspace_structure = create_workspace_structure(data)
+            json_data = json.dumps(workspace_structure, indent=4)
+
+        return json_data
 
     def organization(self):
         print(f"\nCurrent organization info:")  # ORGANIZATION INFO
@@ -194,61 +227,6 @@ def wipe_workspaces_and_permissions(
         print("Error making API call:", e)
 
 
-def visualize_workspace_hierarchy(sdk: classmethod):
-    data = {}
-
-    tree = Tree()
-    tree.create_node("GoodData", "root")
-    for workspace in sdk.catalog_workspace.list_workspaces():
-        print(workspace)
-        parent_id = workspace.parent_id if workspace.parent_id else "root"
-        # print(workspace.id, workspace.name, workspace.parent_id)
-        data[workspace.id] = {
-            'name': workspace.name,
-            'parent_id': workspace.parent_id
-        }
-
-        def create_workspace_structure(data, parent_id=None):
-            workspace_list = []
-
-            for key, value in data.items():
-                if value["parent_id"] == parent_id:
-                    workspace = {
-                        "id": key,
-                        "name": value["name"],
-                        "parent_id": parent_id,
-                        "children": create_workspace_structure(data, key)
-                    }
-                    workspace_list.append(workspace)
-
-            return workspace_list
-
-        workspace_structure = create_workspace_structure(data)
-        json_data = json.dumps(workspace_structure, indent=4)
-
-    return json_data
-
-data = {
-    "ws hierarchy": {
-        "ws_id1": {
-            "name": "Workspace Name 1",
-            "wdf_id": "WDF Client ID 1",
-            "parent_id": None
-        },
-        "ws_id2": {
-            "name": "Workspace Name 2",
-            "wdf_id": "WDF Client ID 2",
-            "parent_id": "ws_id1"
-        },
-        "ws_id3": {
-            "name": "Workspace Name 3",
-            "wdf_id": "WDF Client ID 3",
-            "parent_id": None
-        }
-    }
-}
-
-
 if __name__ == "__main__":
     # host, token, sdk = init_gd()
     gooddata = LoadGoodDataSdk()
@@ -256,21 +234,18 @@ if __name__ == "__main__":
         print(f"user {user.id} with relations {user.relationships}")
 
     # VIEW func
-    json_data = visualize_workspace_hierarchy(gooddata._sdk)
-    #print(json_data)
+    # json_data = visualize_workspace_hierarchy(gooddata._sdk)
+    # print(json_data)
+    json_data = gooddata.visualize_workspace_hierarchy()
+    print(json_data)
 
     # Create or Update
     # gooddata.create_wks("prod_hack", "Prod Hack", None)
     # gooddata.create_wks("dev_hack", "Dev Hack", None)
 
-    #gooddata.manage_wks("test2", "Test", "production") # Change name, or delete. id and parent_id cannot be changed
+    # gooddata.manage_wks("test2", "Test", "production") # Change name, or delete. id and parent_id cannot be changed
     # gooddata.delete_wks("dev_hack")
 
     # Push to Prod
-    gooddata.get_wks("dev_hack")
-    gooddata.put_wks("prod_hack", gooddata.get_wks("dev_hack"))
-
-
-
-
-
+    # gooddata.get_wks("dev_hack")
+    # gooddata.put_wks("prod_hack", gooddata.get_wks("dev_hack"))
