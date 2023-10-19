@@ -49,9 +49,9 @@ def manage_ws(wks_id: str, wks_name: str):
     gooddata.manage_wks(wks_id, wks_name, None) # Change name, or delete. id and parent_id cannot be changed
     return {"message": f"Succesfully renamed {wks_id}: new name {wks_name}"} 
 
-def create_ws(wks_id: str, wks_name: str):
+def create_ws(wks_id: str, wks_name: str, parent_id: str=""):
     gooddata = get_gooddata()
-    gooddata.create_wks(wks_id, wks_name, None)
+    gooddata.create_wks(wks_id, wks_name, parent_id)
     return {"message": f"Workspace {wks_id} created... "} 
 
 def delete_ws(wks_id: str):
@@ -82,6 +82,7 @@ def workspace():
         id = request.args.get('id', '')
         action = request.args.get('action', '')
         name = request.args.get('name', '')
+        parent = request.args.get('parent', '')
         if action == 'view':
             if len(id) > 0:
                 return view_ws(id)
@@ -90,9 +91,9 @@ def workspace():
         elif action == 'create':
             if len(id) > 0:
                 if len(name) > 0:
-                    return create_ws(id, name)
+                    return create_ws(id, name, parent)
                 else:
-                    return create_ws(id, id)
+                    return create_ws(id, id, parent)
             else:
                 return {"message": "no id provided for creating new name"}
         elif action == 'manage':
