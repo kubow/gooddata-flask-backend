@@ -4,7 +4,7 @@ from flask_cors import CORS
 import json
 
 app = Flask(__name__)
-CORS(app, resources={r"/ws/*": {"origins": "https://127.0.0.1:8080", "methods": ["GET", "POST", "DELETE"]}})
+CORS(app, resources={r"/ws/*": {"origins": ["https://127.0.0.1:8080", "https://data-dragons.netlify.app"], "methods": ["GET", "POST", "DELETE"]}})
 
 def get_headers():
     # Access the Authorization header
