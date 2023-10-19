@@ -20,6 +20,9 @@ class LoadGoodDataSdk:
         self.workspaces = self._sdk.catalog_workspace.list_workspaces()
         self.declarative_workspaces = self._sdk.catalog_workspace.get_declarative_workspaces()
 
+    def push_to_prod(self, ws_id, name, parent_id):
+        self._sdk.catalog_workspace.create_or_update(ws_id, name, parent_id)
+
     def organization(self):
         print(f"\nCurrent organization info:")  # ORGANIZATION INFO
         pretty(self._sdk.catalog_organization.get_organization().to_dict())
@@ -179,8 +182,9 @@ def visualize_workspace_hierarchy(sdk: classmethod):
     tree = Tree()
     tree.create_node("GoodData", "root")
     for workspace in sdk.catalog_workspace.list_workspaces():
+        print(workspace)
         parent_id = workspace.parent_id if workspace.parent_id else "root"
-        #print(workspace.id, workspace.name, workspace.parent_id)
+        # print(workspace.id, workspace.name, workspace.parent_id)
         data[workspace.id] = {
             'name': workspace.name,
             'parent_id': workspace.parent_id
@@ -217,25 +221,30 @@ def visualize_workspace_hierarchy(sdk: classmethod):
 #     }
 # }
 
-# data = {
-#     "ws hierarchy": {
-#         "ws_id1": {
-#             "name": "Workspace Name 1",
-#             "wdf_id": "WDF Client ID 1",
-#             "parent_id": None
-#         },
-#         "ws_id2": {
-#             "name": "Workspace Name 2",
-#             "wdf_id": "WDF Client ID 2",
-#             "parent_id": "ws_id1"
-#         },
-#         "ws_id3": {
-#             "name": "Workspace Name 3",
-#             "wdf_id": "WDF Client ID 3",
-#             "parent_id": None
-#         }
-#     }
-# }
+data = {
+    "ws hierarchy": {
+        "ws_id1": {
+            "name": "Workspace Name 1",
+            "wdf_id": "WDF Client ID 1",
+            "parent_id": None
+        },
+        "ws_id2": {
+            "name": "Workspace Name 2",
+            "wdf_id": "WDF Client ID 2",
+            "parent_id": "ws_id1"
+        },
+        "ws_id3": {
+            "name": "Workspace Name 3",
+            "wdf_id": "WDF Client ID 3",
+            "parent_id": None
+        }
+    }
+}
+
+
+
+
+
 
 # def create_workspace(ws_id, name):
 #     # Call the function to create a workspace
@@ -253,14 +262,15 @@ if __name__ == "__main__":
     for user in gooddata.users:
         print(f"user {user.id} with relations {user.relationships}")
 
-    #VIEW func
+    # VIEW func
     json_data = visualize_workspace_hierarchy(gooddata._sdk)
     print(json_data)
 
-    #print(gooddata.declarative_workspaces)
-
     # #CREATE func
-    # # Iterate through the data and call the function for each key where parent_id is None
+    # Iterate through the data and call the function for each key where parent_id is None
     # for ws_id, workspace_data in data.get("ws hierarchy", {}).items():
     #     if workspace_data.get("parent_id") is None:
     #         create_workspace(ws_id, workspace_data.get("name"))
+
+    # PUSH TO PROD
+    gooddata.push_to_prod("test", "test", None)
