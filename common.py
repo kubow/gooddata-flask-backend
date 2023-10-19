@@ -115,7 +115,7 @@ def create_workspace_structure(data, parent_id=None):
     workspace_list = []
 
     for key, value in data.items():
-        if value["parent_id"] == parent_id or not parent_id:
+        if value["parent_id"] == parent_id:
             workspace = {
                 "id": key,
                 "name": value["name"],
