@@ -20,12 +20,20 @@ class LoadGoodDataSdk:
         self.workspaces = self._sdk.catalog_workspace.list_workspaces()
         self.declarative_workspaces = self._sdk.catalog_workspace.get_declarative_workspaces()
 
-    def push_to_prod(self, ws_id, name, parent_id):
+    def create_wks(self, ws_id, name, parent_id):
         if parent_id is None:
             parent_id = ""  # Convert None to an empty string
 
         workspace = CatalogWorkspace(workspace_id=ws_id, name=name, parent_id=parent_id)
         self._sdk.catalog_workspace.create_or_update(workspace)
+
+    def manage_wks(self, ws_id, name, parent_id):
+        workspace = CatalogWorkspace(workspace_id=ws_id, name=name, parent_id=parent_id)
+        self._sdk.catalog_workspace.create_or_update(workspace)
+
+    def delete_wks(self, ws_id):
+        # Delete workspace
+        self._sdk.catalog_workspace.delete_workspace(workspace_id=ws_id)
 
     def organization(self):
         print(f"\nCurrent organization info:")  # ORGANIZATION INFO
@@ -261,6 +269,9 @@ if __name__ == "__main__":
     #         create_workspace(ws_id, workspace_data.get("name"))
 
     # Create or Update
-    gooddata.push_to_prod("123", "Test demo", None)
+    #gooddata.create_wks("test2", "Test demo", "production")
+    #gooddata.manage_wks("test2", "Test", "production") # Change name, or delete. id and parent_id cannot be changed
+    #gooddata.delete_wks("123")
+
 
 
