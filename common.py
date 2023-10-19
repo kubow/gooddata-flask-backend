@@ -6,6 +6,7 @@ from gooddata_sdk import GoodDataSdk, CatalogWorkspace
 from pathlib import Path
 from treelib import Tree
 import requests
+import yaml
 
 
 class LoadGoodDataSdk:
@@ -39,6 +40,12 @@ class LoadGoodDataSdk:
 
     def put_wks(self, ws_id, layout):
         return self._sdk.catalog_workspace.put_declarative_workspace(workspace_id=ws_id, workspace=layout)
+
+    def get_yaml(self, ws_id):
+        return yaml.dump(self._sdk.catalog_workspace.get_declarative_workspace(workspace_id=ws_id), default_style='|')
+
+    def get_json_from_yaml(self, yaml_file):
+        return json.dumps(yaml_file, indent=2)
 
     def visualize_workspace_hierarchy(self):
         data = {}
@@ -249,3 +256,9 @@ if __name__ == "__main__":
     # Push to Prod
     # gooddata.get_wks("dev_hack")
     # gooddata.put_wks("prod_hack", gooddata.get_wks("dev_hack"))
+
+    # Get yaml
+    # print(gooddata.get_yaml("dev_hack"))
+
+    # Get json
+    print(gooddata.get_json_from_yaml(gooddata.get_yaml("dev_hack")))
