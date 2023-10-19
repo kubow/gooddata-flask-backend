@@ -10,9 +10,8 @@ import yaml
 
 
 class LoadGoodDataSdk:
-    def __init__(self):
-        v = get_variables()
-        self._sdk = GoodDataSdk.create(v["GOODDATA_HOST"], v["GOODDATA_TOKEN"])
+    def __init__(self, endpoint: str, token: str):
+        self._sdk = GoodDataSdk.create(endpoint, token)
         self.users = (
             self._sdk.catalog_user.list_users()
         )  # alternative get_declarative_users()
@@ -47,12 +46,14 @@ class LoadGoodDataSdk:
     def get_json_from_yaml(self, yaml_file):
         return json.dumps(yaml_file, indent=2)
 
-    def visualize_workspace_hierarchy(self):
+    def visualize_workspace_hierarchy(self, id: str=None):
         data = {}
 
         tree = Tree()
         tree.create_node("GoodData", "root")
         for workspace in self._sdk.catalog_workspace.list_workspaces():
+            if id and workspace.id != id and workspace.parent_id != id:
+                continue
             # print(workspace)
             parent_id = workspace.parent_id if workspace.parent_id else "root"
             # print(workspace.id, workspace.name, workspace.parent_id)
@@ -60,25 +61,9 @@ class LoadGoodDataSdk:
                 'name': workspace.name,
                 'parent_id': workspace.parent_id
             }
-
-            def create_workspace_structure(data, parent_id=None):
-                workspace_list = []
-
-                for key, value in data.items():
-                    if value["parent_id"] == parent_id:
-                        workspace = {
-                            "id": key,
-                            "name": value["name"],
-                            "parent_id": parent_id,
-                            "children": create_workspace_structure(data, key)
-                        }
-                        workspace_list.append(workspace)
-
-                return workspace_list
-
-            workspace_structure = create_workspace_structure(data)
+            workspace_structure = create_workspace_structure(data, parent_id=None)
             json_data = json.dumps(workspace_structure, indent=4)
-
+        
         return json_data
 
     def organization(self):
@@ -126,6 +111,20 @@ class LoadGoodDataSdk:
         elif of_type == "insight":
             return self._sdk.insights.get_insight(value)
 
+def create_workspace_structure(data, parent_id=None):
+    workspace_list = []
+
+    for key, value in data.items():
+        if value["parent_id"] == parent_id:
+            workspace = {
+                "id": key,
+                "name": value["name"],
+                "parent_id": parent_id,
+                "children": create_workspace_structure(data, key)
+            }
+            workspace_list.append(workspace)
+
+    return workspace_list
 
 def get_variables():
     try:
@@ -236,15 +235,16 @@ def wipe_workspaces_and_permissions(
 
 if __name__ == "__main__":
     # host, token, sdk = init_gd()
-    gooddata = LoadGoodDataSdk()
-    for user in gooddata.users:
-        print(f"user {user.id} with relations {user.relationships}")
+    gooddata = LoadGoodDataSdk(endpoint="https://jav.demo.cloud.gooddata.com/",
+    token="SmFrdWIuVmFqZGE6c3RyZWFtbGl0X2hhY2thdG9uOmZjbW0xY3c3ZThSU09zU3hCcTFVR0UyWlRlSVc3VnV5")
+    # for user in gooddata.users:
+    #     print(f"user {user.id} with relations {user.relationships}")
 
     # VIEW func
-    # json_data = visualize_workspace_hierarchy(gooddata._sdk)
-    # print(json_data)
     json_data = gooddata.visualize_workspace_hierarchy()
     print(json_data)
+    # json_data = gooddata.visualize_workspace_hierarchy()
+    # print(json_data)
 
     # Create or Update
     # gooddata.create_wks("prod_hack", "Prod Hack", None)
@@ -261,4 +261,4 @@ if __name__ == "__main__":
     # print(gooddata.get_yaml("dev_hack"))
 
     # Get json
-    print(gooddata.get_json_from_yaml(gooddata.get_yaml("dev_hack")))
+    # print(gooddata.get_json_from_yaml(gooddata.get_yaml("dev_hack")))
