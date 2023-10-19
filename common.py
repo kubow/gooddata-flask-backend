@@ -115,7 +115,7 @@ def create_workspace_structure(data, parent_id=None):
     workspace_list = []
 
     for key, value in data.items():
-        if value["parent_id"] == parent_id:
+        if value["parent_id"] == parent_id or not parent_id:
             workspace = {
                 "id": key,
                 "name": value["name"],
@@ -241,15 +241,21 @@ if __name__ == "__main__":
     #     print(f"user {user.id} with relations {user.relationships}")
 
     # VIEW func
-    json_data = gooddata.visualize_workspace_hierarchy()
-    print(json_data)
+    print("################# All hierarchy")
+    print(gooddata.visualize_workspace_hierarchy())
+    print("################# Production with one child")
+    print(gooddata.visualize_workspace_hierarchy("production"))
+    print("################# Test with")
+    print(gooddata.visualize_workspace_hierarchy("test"))
+    
     # json_data = gooddata.visualize_workspace_hierarchy()
     # print(json_data)
 
     # Create or Update
-    # gooddata.create_wks("prod_hack", "Prod Hack", None)
-    # gooddata.create_wks("dev_hack", "Dev Hack", None)
+    # gooddata.create_wks("abc", "Department A", "ws-snowflake-demo")
+    # gooddata.create_wks("def", "Department B", "ws-snowflake-demo")
 
+    # gooddata.create_wks("ghi", "Department A1", "abc")
     # gooddata.manage_wks("test2", "Test", "production") # Change name, or delete. id and parent_id cannot be changed
     # gooddata.delete_wks("dev_hack")
 

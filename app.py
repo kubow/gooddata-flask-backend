@@ -128,9 +128,11 @@ def provision():
     # For this example, let's assume a simple dictionary mapping addresses to content.
     verify = get_headers()
 
-    source_id = request.args.get('id', 'ws-snowflake-demo')
-    target_id = request.args.get('id', 'new')
-
+    if "Bearer" in verify.keys():
+        source_id = request.args.get('source', 'ws-snowflake-demo')
+        target_id = request.args.get('target', 'new')
+        gooddata = get_gooddata()
+        gooddata.put_wks(source_id, gooddata.get_wks(target_id))
     return "Workspace provisioned"
 
 
