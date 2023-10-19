@@ -1,10 +1,12 @@
 from dotenv import dotenv_values
 from os import getenv
+import json
 from dotenv import load_dotenv
 from gooddata_sdk import GoodDataSdk, CatalogWorkspace
 from pathlib import Path
 from treelib import Tree
 import requests
+
 
 class LoadGoodDataSdk:
     def __init__(self):
@@ -72,7 +74,7 @@ def get_variables():
                 "GOODDATA_TOKEN": getenv("GOODDATA_TOKEN"),
             }
         else:
-            file = (Path(__file__).parent/ ".env").resolve()
+            file = (Path(__file__).parent / ".env").resolve()
             if file.is_file():
                 print(".env file read...")
                 temp = dotenv_values(file)
@@ -84,7 +86,7 @@ def get_variables():
             f"GOODDATA_HOST: {temp['GOODDATA_HOST']}\n",
             f"GOODDATA_TOKEN: {len(temp['GOODDATA_TOKEN'])} characters",
         )
-        return temp 
+        return temp
 
 
 def pretty(d, indent=1, char="-"):
@@ -92,7 +94,7 @@ def pretty(d, indent=1, char="-"):
         if isinstance(value, dict):
             pretty(value, indent + 2)
         else:
-            print(f"{char*(indent)} {str(key)} : {str(value)}")
+            print(f"{char * (indent)} {str(key)} : {str(value)}")
 
 
 def first_item(dataset, attr=""):
@@ -116,7 +118,7 @@ def init_gd(default_env: str = "test"):
 
 
 def wipe_workspaces_and_permissions(
-    wdf_id: str, workspace_ids: list[str], host: str, token: str, sdk: classmethod
+        wdf_id: str, workspace_ids: list[str], host: str, token: str, sdk: classmethod
 ) -> None:
     f"""
     This method is used when you want to wipe/delete workspaces via id and related workspace permissions
@@ -170,11 +172,19 @@ def wipe_workspaces_and_permissions(
         print("Error making API call:", e)
 
 
-def visualize_workspace_hierarchy(sdk: classmethod) -> None:
+def visualize_workspace_hierarchy(sdk: classmethod):
+    hierarchy = {}
+
     tree = Tree()
     tree.create_node("GoodData", "root")
     for workspace in sdk.catalog_workspace.list_workspaces():
         parent_id = workspace.parent_id if workspace.parent_id else "root"
+        #print(workspace.id, workspace.name, workspace.parent_id)
+        hierarchy[workspace.id] = {
+            'name': workspace.name,
+            'parent_id': workspace.parent_id
+        }
+        json_data = json.dumps(hierarchy, indent=4)
         if tree.get_node(workspace.id):
             continue  # we already established the node
         elif tree.get_node(parent_id):
@@ -185,6 +195,18 @@ def visualize_workspace_hierarchy(sdk: classmethod) -> None:
             tree.create_node(temp_root.name, temp_root.id, parent=temp_parent_id)
             tree.create_node(workspace.name, workspace.id, parent=parent_id)
     tree.show(line_type="ascii-em")
+    return json_data
+
+
+# data = {
+#     "ws hierarchy": {
+#         "ws_id": {
+#             "name": "Workspace Name",
+#             "wdf_id": "WDF Client ID",
+#             "parent_id": "Parent ID"
+#         }
+#     }
+# }
 
 
 if __name__ == "__main__":
@@ -192,4 +214,5 @@ if __name__ == "__main__":
     gooddata = LoadGoodDataSdk()
     for user in gooddata.users:
         print(f"user {user.id} with relations {user.relationships}")
-    visualize_workspace_hierarchy(gooddata._sdk)
+    json_data = visualize_workspace_hierarchy(gooddata._sdk)
+    print(json_data)
