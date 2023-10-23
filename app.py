@@ -4,7 +4,12 @@ from flask_cors import CORS
 import json
 
 app = Flask(__name__)
-CORS(app, resources={r"/ws/*": {"origins": ["https://127.0.0.1:8080", "https://data-dragons.netlify.app"], "methods": ["GET", "POST", "DELETE"]}})
+# we have to allow frontend environments via CORS
+ALLOWED=["https://127.0.0.1:8080", "https://data-dragons.netlify.app"]
+CORS(app, resources={r"/ws/*": {"origins": ALLOWED, "methods": ["GET", "POST", "DELETE"]}})
+# for sake of simplicity: please insert your connection details
+GOODDATA_HOST=""
+GOODDATA_TOKEN=""
 
 def get_headers():
     # Access the Authorization header
@@ -31,9 +36,7 @@ def get_headers():
         }
     return content
 
-def get_gooddata(endpoint: str="https://jav.demo.cloud.gooddata.com/",
-    token: str="SmFrdWIuVmFqZGE6c3RyZWFtbGl0X2hhY2thdG9uOmZjbW0xY3c3ZThSU09zU3hCcTFVR0UyWlRlSVc3VnV5"
-    ):
+def get_gooddata(endpoint: str=GOODDATA_HOST, token: str=GOODDATA_TOKEN):
     return LoadGoodDataSdk(endpoint, token)
 
 def export_ws(wks_id: str, export_type: str):
