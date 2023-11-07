@@ -235,8 +235,8 @@ def wipe_workspaces_and_permissions(
 
 if __name__ == "__main__":
     # host, token, sdk = init_gd()
-    gooddata = LoadGoodDataSdk(endpoint="https://jav.demo.cloud.gooddata.com/",
-    token="SmFrdWIuVmFqZGE6c3RyZWFtbGl0X2hhY2thdG9uOmZjbW0xY3c3ZThSU09zU3hCcTFVR0UyWlRlSVc3VnV5")
+    gooddata = LoadGoodDataSdk(endpoint="GOODDATA_HOST",
+    token="GOODDATA_TOKEN")
     # for user in gooddata.users:
     #     print(f"user {user.id} with relations {user.relationships}")
 
