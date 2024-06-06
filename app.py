@@ -8,11 +8,11 @@ import json
 
 app = Flask(__name__)
 # we have to allow frontend environments via CORS
-ALLOWED=["https://127.0.0.1:8080", "https://data-dragons.netlify.app"]
+ALLOWED=["https://127.0.0.1:8080", "https://127.0.0.1:3001", "https://localhost:3001", "https://data-dragons.netlify.app"]
 CORS(app, resources={r"/ws/*": {"origins": ALLOWED, "methods": ["GET", "POST", "DELETE"]}})
 # for sake of simplicity: please insert your connection details
-GOODDATA_HOST="https://navy-blue-eagle.trial.cloud.gooddata.com/"
-GOODDATA_TOKEN="amFrdWIudmFqZGE6TmV3Ok5Qa2d6ZTVPZElHbTVMQU1kZk1TU1R1dFpZWU4rMmNm"
+GOODDATA_HOST=""
+GOODDATA_TOKEN=""
 
 def get_headers():
     # Access the Authorization header
@@ -82,12 +82,11 @@ def home():
 def export():
     # inspired by: https://www.geeksforgeeks.org/how-to-create-pdf-files-in-flask/
     dashboard = request.args.get('db', '')
-    visual = request.args.get('vis', '2da13424-2a6b-4ed4-916c-9bbc002fdd1b')
-    workspace = request.args.get('ws', 'gdc_demo_8233544a-ce3b-48e4-a005-cd3dabd6667f')
+    visual = request.args.get('vis', '')
+    workspace = request.args.get('ws', '')
     
-    x = get_variables()
     # list dataframes available within a specific workspace
-    gp = GoodPandas(x['GOODDATA_HOST'], x['GOODDATA_TOKEN'])
+    gp = GoodPandas(get_variables()['GOODDATA_HOST'], get_variables()['GOODDATA_TOKEN'])
     frames = gp.data_frames(workspace)
     
     # select visualization from a list
@@ -110,6 +109,7 @@ def export():
     # generate HTML report
     outputText = template.render(settings)
     
+    # we are directly returning the generated pdf file
     if dashboard:
         return {"message": "This is the default page for GoodData pink pages."} 
     else:
