@@ -5,6 +5,8 @@ Flask-based appication to gather and update GDC settings.
 ## Implemented functionality
 
 - index page - status display
+- `/export?ws="workspace_id"&db="dashboard_id"&vis="visual_id"`
+  - exports predefined report as a PDF
 - `/ws?action="{type}"&id="feature_id"&name="if_to_be_changed"`
   - action **view**: displays workspace tree structure (if id submitted only the corresponding sub-part)
   - action **create**: creates a new workspace (if no name defined, name = id)

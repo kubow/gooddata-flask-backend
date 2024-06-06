@@ -1,0 +1,56 @@
+/* Basic styles */
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+table {
+    border-collapse: collapse; /* Ensures table borders don't overlap cell borders */
+    width: 100%; /* Optional: Set a width for the table */
+  }
+  
+th, td {
+    padding: 10px; /* Adjust padding as desired */
+    border: 1px solid #ddd; /* Add a thin border to cells */
+    text-align: left; /* Align content to the left */
+}
+  
+th {
+    background-color: #f2f2f2; /* Light gray background for headers */
+    font-weight: bold; /* Bold text for headers */
+}
+  
+tr:nth-child(even) {
+    background-color: #eee; /* Lighten background color for even rows */
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #f2f2f2;
+}
+footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #f2f2f2;
+}
+h1 {
+    font-size: 2em;
+    margin: 0;
+}
+/* Logo styling (replace with your logo image) */
+.logo img {
+    width: 100px;
+    height: auto;
+}
+
+/* Renderring settings for reports */
+@page {
+  size: Landscape; 
+  margin: 8%; }
+

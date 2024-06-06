@@ -1,0 +1,38 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report example (GoodData + Python SDK)</title>
+    <link rel="stylesheet" type="text/css" href="{{ css }}">
+</head>
+<body>
+    <header>
+        <h1>Report Example</h1>
+        <div class="logo">
+            <svg width="100" height="100">
+                <text x="50" y="50" font-size="20" text-anchor="middle">
+                    Company LOGO
+                </text>
+            </svg>
+        </div>
+    </header>
+    <main>
+        <div class="description">
+            <p>Detailed table report:</p>
+            {{ first_table }}
+        </div>
+        <div class="visual">
+            <p>Graphical overview:</p>
+            <img src='{{ first_visual }}' width="800">
+        </div>
+    </main>
+    <footer>
+        <p>Generated: <span id="generated-time"></span></p>
+        <p>&copy; [Your Company Name]</p>
+    </footer>
+    <script>
+        // Update generated time dynamically
+        document.getElementById("generated-time").textContent = new Date().toLocaleString();
+    </script>
+</body>
+</html>

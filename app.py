@@ -1,6 +1,9 @@
-from common import LoadGoodDataSdk #, visualize_workspace_hierarchy
-from flask import Flask,request, jsonify, Response
+from common import LoadGoodDataSdk, get_variables
+from gooddata_pandas import GoodPandas
+from flask import Flask,request, jsonify, Response, url_for
 from flask_cors import CORS
+from flask_weasyprint import HTML, render_pdf
+from jinja2 import Environment, FileSystemLoader
 import json
 
 app = Flask(__name__)
@@ -8,8 +11,8 @@ app = Flask(__name__)
 ALLOWED=["https://127.0.0.1:8080", "https://data-dragons.netlify.app"]
 CORS(app, resources={r"/ws/*": {"origins": ALLOWED, "methods": ["GET", "POST", "DELETE"]}})
 # for sake of simplicity: please insert your connection details
-GOODDATA_HOST=""
-GOODDATA_TOKEN=""
+GOODDATA_HOST="https://navy-blue-eagle.trial.cloud.gooddata.com/"
+GOODDATA_TOKEN="amFrdWIudmFqZGE6TmV3Ok5Qa2d6ZTVPZElHbTVMQU1kZk1TU1R1dFpZWU4rMmNm"
 
 def get_headers():
     # Access the Authorization header
@@ -74,6 +77,43 @@ def view_ws(wks_id: str=""):
 @app.route('/')
 def home():
     return {"message": "This is the default page for GoodData pink pages."} 
+
+@app.route('/export')
+def export():
+    # inspired by: https://www.geeksforgeeks.org/how-to-create-pdf-files-in-flask/
+    dashboard = request.args.get('db', '')
+    visual = request.args.get('vis', '2da13424-2a6b-4ed4-916c-9bbc002fdd1b')
+    workspace = request.args.get('ws', 'gdc_demo_8233544a-ce3b-48e4-a005-cd3dabd6667f')
+    
+    x = get_variables()
+    # list dataframes available within a specific workspace
+    gp = GoodPandas(x['GOODDATA_HOST'], x['GOODDATA_TOKEN'])
+    frames = gp.data_frames(workspace)
+    
+    # select visualization from a list
+    vis_list = gp.sdk.visualizations.get_visualizations(workspace)
+
+    # first a table generated into HTML
+    table_df = frames.for_visualization(visual)
+    settings = {
+        "html": "template.html",
+        "css": "static/style.css",
+        "html_final": "report.html",
+        "first_visual": "static/visual.png",
+        "first_table": table_df.to_html(),
+        "pdf": "report.pdf",
+    }
+    # prepare template
+    env = Environment(loader=FileSystemLoader("static"))
+    template = env.get_template(settings["html"])
+    
+    # generate HTML report
+    outputText = template.render(settings)
+    
+    if dashboard:
+        return {"message": "This is the default page for GoodData pink pages."} 
+    else:
+        return render_pdf(HTML(string=outputText))
 
 @app.route('/ws', methods=['GET', 'POST', 'DELETE'])
 def workspace():
