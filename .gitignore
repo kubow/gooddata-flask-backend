@@ -119,8 +119,8 @@ celerybeat.pid
 # SageMath parsed files
 *.sage.py
 
-# Environments
-.env
+# Environments (.env is example one)
+.env.*
 .venv
 env/
 venv/
@@ -144,10 +144,10 @@ flask
 .dmypy.json
 dmypy.json
 
-# Pyre type checker
+# Pyre content_type checker
 .pyre/
 
-# pytype static type analyzer
+# pytype static content_type analyzer
 .pytype/
 
 # Cython debug symbols
